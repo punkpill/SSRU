@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="스스로움">
+<title>스스로움</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%231a1a2e'/%3E%3Cstop offset='100%25' stop-color='%2316213e'/%3E%3C/linearGradient%3E%3ClinearGradient id='gSS' x1='0%25' y1='0%25' x2='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%234f8ef7'/%3E%3Cstop offset='100%25' stop-color='%237c6ff7'/%3E%3C/linearGradient%3E%3ClinearGradient id='gRU' x1='0%25' y1='0%25' x2='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%2352c9a0'/%3E%3Cstop offset='100%25' stop-color='%23d4a017'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='url(%23bg)'/%3E%3Crect x='24' y='74' width='132' height='3' rx='1.5' fill='white' opacity='0.12'/%3E%3Ctext x='90' y='72' font-family='Helvetica Neue%2C Arial%2C sans-serif' font-size='58' font-weight='800' fill='url(%23gSS)' text-anchor='middle' letter-spacing='-3'%3ESS%3C/text%3E%3Ctext x='90' y='130' font-family='Helvetica Neue%2C Arial%2C sans-serif' font-size='58' font-weight='800' fill='url(%23gRU)' text-anchor='middle' letter-spacing='-3'%3ERU%3C/text%3E%3C/svg%3E">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+/* ── THEME VARIABLES (changed per tab) ── */
+:root{
+  /* Tab 0: Work — dusty blue pastel */
+  --t0-h: #f0f5fc;
+  --t0-light: #e4edf8;
+  --t0-mid: #a8bfe0;
+  --t0-main: #6a93c8;
+  --t0-deep: #4a70a8;
+  --t0-urgent-bg: #e4edf8;
+  --t0-urgent: #3a5a90;
+  --t0-stripe: #6a93c8;
+  --t0-urgent-stripe: #3a5a90;
+
+  /* Tab 1: Personal — sage green pastel */
+  --t1-h: #f0f8f4;
+  --t1-light: #dff0e8;
+  --t1-mid: #96c8ae;
+  --t1-main: #5e9e7e;
+  --t1-deep: #3d7a5e;
+  --t1-urgent-bg: #dff0e8;
+  --t1-urgent: #2d6048;
+  --t1-stripe: #5e9e7e;
+  --t1-urgent-stripe: #2d6048;
+
+  /* Tab 2: Shopping — muted lavender pastel */
+  --t2-h: #f3f1fb;
+  --t2-light: #e8e4f6;
+  --t2-mid: #b4a8e0;
+  --t2-main: #8878c0;
+  --t2-deep: #6558a0;
+  --t2-urgent-bg: #e8e4f6;
+  --t2-urgent: #4e4080;
+  --t2-stripe: #8878c0;
+  --t2-urgent-stripe: #4e4080;
+
+  /* Tab 3: Routine — soft pure yellow (pikachu/yolk toned down) */
+  --t3-h: #fdfbee;
+  --t3-light: #faf5d0;
+  --t3-mid: #e8d870;
+  --t3-main: #c8b830;
+  --t3-deep: #a09020;
+  --t3-urgent-bg: #faf5d0;
+  --t3-urgent: #807010;
+  --t3-stripe: #c8b830;
+  --t3-urgent-stripe: #807010;
+
+  /* Active theme (defaults to tab 0) */
+  --th: var(--t0-h);
+  --tl: var(--t0-light);
+  --tm: var(--t0-mid);
+  --ta: var(--t0-main);
+  --td: var(--t0-deep);
+  --tu-bg: var(--t0-urgent-bg);
+  --tu: var(--t0-urgent);
+  --ts: var(--t0-stripe);
+  --tus: var(--t0-urgent-stripe);
+
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --text: #1e2535;
+  --text2: #6b7592;
+  --text3: #b8bfd4;
+  --border: rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.04);
+  --shadow: 0 1px 10px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --radius-sm: 12px;
+  --safe-top: env(safe-area-inset-top,0px);
+  --safe-bottom: env(safe-area-inset-bottom,0px);
+}
+
+/* Theme transitions */
+body{ transition: background 0.35s; }
+.header,.tabbar,.main,.modal { transition: background 0.35s; }
+
+body{
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  height: 100dvh; overflow: hidden;
+  display: flex; flex-direction: column;
+  padding-top: var(--safe-top);
+}
+
+/* ── HEADER ── */
+.header{
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  padding: 13px 18px 12px;
+  position: relative; overflow: hidden;
+}
+.hd-blob{
+  position:absolute; top:-40px; right:-30px;
+  width:140px; height:140px; border-radius:50%;
+  background: var(--tl); opacity:0.5;
+  transition: background 0.35s;
+}
+.hd-blob2{
+  position:absolute; bottom:-20px; left:-10px;
+  width:70px; height:70px; border-radius:50%;
+  background: var(--tl); opacity:0.3;
+  transition: background 0.35s;
+}
+.header-inner{ display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; }
+
+/* ── SSRU LOGO ICON ── */
+.logo-icon{
+  width: 46px; height: 46px; border-radius: 14px;
+  flex-shrink: 0;
+  position: relative; overflow: hidden;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.22);
+  background: linear-gradient(150deg,#1a1a2e 0%,#16213e 100%);
+}
+.logo-icon svg{ position:relative; z-index:1; }
+
+.logo-texts{ margin-left:11px; }
+.logo-title{ font-size:22px; font-weight:800; color:var(--text); letter-spacing:-1px; line-height:1; }
+.logo-sub{
+  font-size:10px; font-weight:700; letter-spacing:1.6px;
+  color: var(--ta); margin-top:2px;
+  transition: color 0.35s;
+}
+
+.header-add-btn{
+  width:40px; height:40px; border-radius:13px;
+  background: var(--ta); border:none; cursor:pointer; color:white;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.16);
+  transition: background 0.35s, transform 0.1s;
+}
+.header-add-btn:active{ transform:scale(0.9); }
+
+/* ── TAB BAR ── */
+.tabbar{
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display:flex; flex-shrink:0; padding:0 4px;
+}
+.tab{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:8px 0 6px; cursor:pointer; position:relative;
+}
+.tab-icon-wrap{
+  width:28px; height:28px; border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  color: var(--text3); transition: background 0.25s, color 0.25s;
+}
+.tab.active .tab-icon-wrap{ background: var(--tl); color: var(--ta); }
+.tab-label{
+  font-size:9.5px; font-weight:600; color:var(--text3);
+  transition: color 0.25s; letter-spacing:-0.2px; white-space:nowrap;
+}
+.tab.active .tab-label{ color: var(--ta); font-weight:700; }
+.tab-cnt{
+  font-size:9px; font-weight:600; color:var(--text3);
+  transition: color 0.25s;
+}
+.tab.active .tab-cnt{ color: var(--ta); }
+.tab-line{
+  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  height:2.5px; width:0; border-radius:2px;
+  background: var(--ta);
+  transition: width 0.28s cubic-bezier(0.34,1.56,0.64,1), background 0.35s;
+}
+.tab.active .tab-line{ width:24px; }
+
+/* ── MAIN ── */
+.main{
+  flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:0 15px 28px;
+}
+
+/* ── SECTION HEADER ── */
+.section-row{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 2px 9px;
+}
+.section-label{ font-size:12px; font-weight:700; color:var(--text2); }
+.section-count{ font-size:11px; font-weight:500; color:var(--text3); }
+
+/* ── TASK CARD ── */
+.task-card{
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  padding:12px 12px 12px 13px;
+  margin-bottom:8px;
+  display:flex; align-items:center; gap:10px;
+  box-shadow: var(--shadow);
+  position:relative; overflow:hidden;
+  transition: transform 0.15s, opacity 0.22s, background 0.35s;
+}
+.task-card::before{
+  content:''; position:absolute; left:0; top:0; bottom:0;
+  width:3.5px; border-radius:2px 0 0 2px;
+  background: var(--ts);
+  transition: background 0.35s;
+}
+.task-card.urgent{
+  background: var(--tu-bg);
+  border-color: rgba(0,0,0,0.08);
+  transition: background 0.35s;
+}
+.task-card.urgent::before{ background: var(--tus); }
+
+/* ── ROUTINE card — theme color, softer than urgent ── */
+.task-card.routine-tint { background: var(--tl); border-color: rgba(0,0,0,0.06); }
+.task-card.routine-tint::before { background: var(--ts); opacity:0.4; }
+
+.task-body{ flex:1; min-width:0; }
+.task-text{ font-size:14.5px; font-weight:500; color:var(--text); line-height:1.45; word-break:break-word; }
+.task-chips{ display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+
+.chip{
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:10px; font-weight:600; border-radius:20px; padding:2px 8px 2px 6px;
+}
+.chip-urgent{
+  background: var(--tl); color: var(--td);
+  transition: background 0.35s, color 0.35s;
+}
+.chip-date{ background:#f1f5f9; color:#64748b; }
+.chip-date.overdue{ background:#fee2e2; color:#dc2626; }
+
+.task-right{ display:flex; align-items:center; gap:5px; flex-shrink:0; }
+
+.act-btn{
+  width:30px; height:30px; border-radius:9px; border:none;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:transform 0.1s;
+}
+.act-btn:active{ transform:scale(0.85); }
+.btn-edit{ background:#f1f5f9; color:#64748b; }
+.btn-del{ background:#fee2e2; color:#ef4444; }
+
+.complete-btn{
+  width:40px; height:40px; border-radius:12px;
+  background: var(--tl); border:none;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; color:var(--ta);
+  transition: background 0.35s, color 0.35s, transform 0.15s;
+}
+.complete-btn:active{ background:var(--ta); color:white; transform:scale(0.88); }
+
+/* ── ADD BTN ── */
+.add-btn{
+  width:100%; background:var(--surface);
+  border:1.5px dashed var(--tm);
+  border-radius:var(--radius);
+  padding:13px 15px;
+  display:flex; align-items:center; gap:10px;
+  color:var(--text3); font-size:13.5px; font-weight:500;
+  cursor:pointer; margin-bottom:10px;
+  transition: background 0.15s, border-color 0.35s;
+}
+.add-btn:active{ background:var(--tl); color:var(--ta); }
+.add-icon{
+  width:28px; height:28px; border-radius:8px;
+  background:var(--tl); color:var(--ta);
+  display:flex; align-items:center; justify-content:center;
+  transition: background 0.35s, color 0.35s;
+}
+
+/* ── EMPTY ── */
+.empty-wrap{ display:flex; flex-direction:column; align-items:center; padding:38px 0 24px; gap:6px; }
+.empty-blob{
+  width:60px; height:60px; border-radius:50%;
+  background:var(--tl); display:flex; align-items:center; justify-content:center;
+  margin-bottom:4px; transition: background 0.35s;
+}
+.empty-t{ font-size:14px; font-weight:600; color:var(--text2); }
+.empty-s{ font-size:12px; color:var(--text3); text-align:center; line-height:1.6; }
+
+/* ── HISTORY ── */
+.history-wrap{ border-top:1px solid var(--border2); margin-top:4px; }
+.hist-toggle-btn{
+  width:100%; background:transparent; border:none;
+  padding:13px 4px 9px; display:flex; align-items:center; justify-content:space-between;
+  cursor:pointer; color:var(--text2);
+}
+.hist-toggle-left{ display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600; }
+.hist-badge{
+  background:var(--tl); color:var(--td);
+  border-radius:20px; padding:2px 8px;
+  font-size:10px; font-weight:700;
+  transition: background 0.35s, color 0.35s;
+}
+.chevron{ transition:transform 0.2s; }
+.chevron.open{ transform:rotate(180deg); }
+.history-panel{ display:none; }
+.history-panel.open{ display:block; }
+
+.period-tabs{ display:flex; gap:6px; margin-bottom:11px; }
+.period-tab{
+  padding:5px 13px; border-radius:20px;
+  border:1px solid var(--border); background:var(--surface);
+  color:var(--text2); font-size:11.5px; font-weight:600;
+  cursor:pointer; transition:all 0.15s;
+}
+.period-tab.active{ background:var(--ta); border-color:var(--ta); color:white; }
+
+.hist-card{
+  background:#f8fafc; border:1px solid var(--border2);
+  border-radius:var(--radius-sm); padding:10px 11px;
+  margin-bottom:6px; display:flex; align-items:center; gap:9px;
+}
+.hist-check{
+  width:24px; height:24px; border-radius:50%;
+  background:var(--tl); color:var(--ta);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition: background 0.35s, color 0.35s;
+}
+.hist-body{ flex:1; min-width:0; }
+.hist-text{ font-size:12.5px; color:var(--text2); text-decoration:line-through; text-decoration-color:var(--text3); word-break:break-word; }
+.hist-meta{ font-size:10.5px; color:var(--text3); margin-top:2px; }
+.hist-btns{ display:flex; gap:4px; }
+.hbtn{
+  width:28px; height:28px; border-radius:8px; border:none;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:transform 0.1s;
+}
+.hbtn:active{ transform:scale(0.85); }
+.hbtn-restore{ background:var(--tl); color:var(--td); transition: background 0.35s, color 0.35s; }
+.hbtn-del{ background:#fee2e2; color:#ef4444; }
+
+/* ── MODAL ── */
+.modal-bg{
+  position:fixed; inset:0;
+  background:rgba(20,30,60,0.28);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  display:flex; align-items:flex-end; z-index:200;
+  opacity:0; pointer-events:none; transition:opacity 0.22s;
+}
+.modal-bg.open{ opacity:1; pointer-events:all; }
+.modal{
+  width:100%; background:var(--surface);
+  border-radius:24px 24px 0 0;
+  padding:18px 19px calc(22px + var(--safe-bottom));
+  border-top:1px solid var(--border);
+  box-shadow:0 -6px 30px rgba(0,0,0,0.1);
+  transform:translateY(100%);
+  transition:transform 0.28s cubic-bezier(0.32,0.72,0,1);
+}
+.modal-bg.open .modal{ transform:translateY(0); }
+.modal-handle{ width:34px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 17px; }
+.modal-title{ font-size:17px; font-weight:700; color:var(--text); margin-bottom:12px; }
+.modal-input{
+  width:100%; background:#f8fafc;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:12px 13px; color:var(--text);
+  font-size:15px; font-family:inherit; outline:none;
+  resize:none; min-height:76px; transition:border-color 0.15s;
+}
+.modal-input:focus{ border-color:var(--ta); background:white; }
+.modal-input::placeholder{ color:var(--text3); }
+
+.toggle-row{
+  display:flex; align-items:center; gap:10px;
+  margin-top:9px; padding:11px 13px;
+  background:#f8fafc; border-radius:var(--radius-sm);
+  border:1px solid var(--border); cursor:pointer;
+}
+.toggle-row.urgent-on{ background:var(--tl); border-color:var(--tm); transition: background 0.35s; }
+.toggle-row-label{ font-size:13.5px; font-weight:600; flex:1; color:var(--text2); }
+.toggle-row.urgent-on .toggle-row-label{ color:var(--td); }
+.toggle-row-sub{ font-size:10.5px; color:var(--text3); margin-top:1px; }
+
+.pill{
+  width:40px; height:22px; border-radius:11px;
+  background:var(--text3); position:relative; flex-shrink:0;
+  transition:background 0.2s;
+}
+.pill.on{ background:var(--ta); }
+.pill-knob{
+  width:18px; height:18px; border-radius:50%; background:white;
+  position:absolute; top:2px; left:2px;
+  transition:left 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.15);
+}
+.pill.on .pill-knob{ left:20px; }
+
+.date-row{ display:none; margin-top:8px; }
+.date-row.open{ display:flex; gap:8px; }
+.date-inp{
+  flex:1; background:#f8fafc; border:1px solid var(--border);
+  border-radius:9px; padding:10px 12px; color:var(--text);
+  font-size:13.5px; font-family:inherit; outline:none;
+}
+.date-inp:focus{ border-color:var(--ta); }
+.date-inp::-webkit-calendar-picker-indicator{ opacity:0.4; }
+
+.modal-actions{ display:flex; gap:9px; margin-top:14px; }
+.btn-cancel{
+  flex:1; padding:13px; background:#f1f5f9;
+  border:none; border-radius:var(--radius-sm);
+  color:var(--text2); font-size:14.5px; font-weight:600;
+  font-family:inherit; cursor:pointer;
+}
+.btn-save{
+  flex:2; padding:13px; background:var(--ta);
+  border:none; border-radius:var(--radius-sm);
+  color:white; font-size:14.5px; font-weight:700;
+  font-family:inherit; cursor:pointer;
+  box-shadow:0 3px 12px rgba(0,0,0,0.15);
+  transition:background 0.35s, opacity 0.1s;
+}
+.btn-save:active{ opacity:0.85; }
+
+/* ── TOAST ── */
+.toast{
+  position:fixed; bottom:calc(78px + var(--safe-bottom));
+  left:50%; transform:translateX(-50%) translateY(12px);
+  background:rgba(20,25,50,0.88); color:white;
+  padding:9px 17px; border-radius:20px;
+  font-size:12.5px; font-weight:500;
+  z-index:300; opacity:0; transition:all 0.22s;
+  white-space:nowrap; pointer-events:none;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="hd-blob"></div>
+  <div class="hd-blob2"></div>
+  <div class="header-inner">
+    <!-- SSRU LOGO -->
+    <div style="display:flex;align-items:center;gap:11px;">
+      <div class="logo-icon">
+        <svg width="46" height="46" viewBox="0 0 46 46" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gSS" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#4f8ef7"/>
+              <stop offset="100%" stop-color="#a06ff7"/>
+            </linearGradient>
+            <linearGradient id="gRU" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#52c9a0"/>
+              <stop offset="100%" stop-color="#d4a017"/>
+            </linearGradient>
+          </defs>
+          <!-- SS top row -->
+          <text x="23" y="22" font-family="Helvetica Neue,Arial,sans-serif" font-size="20" font-weight="800" fill="url(#gSS)" text-anchor="middle" letter-spacing="-1">SS</text>
+          <!-- thin separator -->
+          <rect x="8" y="24.5" width="30" height="1" rx="0.5" fill="white" opacity="0.18"/>
+          <!-- RU bottom row -->
+          <text x="23" y="40" font-family="Helvetica Neue,Arial,sans-serif" font-size="20" font-weight="800" fill="url(#gRU)" text-anchor="middle" letter-spacing="-1">RU</text>
+        </svg>
+      </div>
+      <div class="logo-texts">
+        <div class="logo-title">스스로움</div>
+        <div class="logo-sub" id="logoSub">WORK & DAILY</div>
+      </div>
+    </div>
+    <button class="header-add-btn" onclick="openAdd()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tabbar">
+  <div class="tab active" onclick="switchTab(0)">
+    <div class="tab-icon-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    </div>
+    <div class="tab-label">회사업무</div>
+    <div class="tab-cnt" id="cnt0"></div>
+    <div class="tab-line"></div>
+  </div>
+  <div class="tab" onclick="switchTab(1)">
+    <div class="tab-icon-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div class="tab-label">개인생활</div>
+    <div class="tab-cnt" id="cnt1"></div>
+    <div class="tab-line"></div>
+  </div>
+  <div class="tab" onclick="switchTab(2)">
+    <div class="tab-icon-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    </div>
+    <div class="tab-label">구매목록</div>
+    <div class="tab-cnt" id="cnt2"></div>
+    <div class="tab-line"></div>
+  </div>
+  <div class="tab" onclick="switchTab(3)">
+    <div class="tab-icon-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><polyline points="12 6 12 12 16 14"/><path d="M22 2 12 12"/></svg>
+    </div>
+    <div class="tab-label">하루루틴</div>
+    <div class="tab-cnt" id="cnt3"></div>
+    <div class="tab-line"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="mainScroll"></div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg" onclick="mbgClick(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">새 할 일 추가</div>
+    <textarea class="modal-input" id="taskInput" placeholder="할 일을 입력하세요..."></textarea>
+
+    <div id="urgentDateSection">
+    <div class="toggle-row" id="urgentRow" onclick="toggleUrgent()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;color:var(--ta);transition:color 0.35s">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <div style="flex:1">
+        <div class="toggle-row-label" id="urgentLabel">빠른 처리</div>
+        <div class="toggle-row-sub">급히 처리할 항목으로 강조</div>
+      </div>
+      <div class="pill" id="urgentPill"><div class="pill-knob"></div></div>
+    </div>
+
+    <div class="toggle-row" onclick="toggleDate()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;color:var(--text3)">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span class="toggle-row-label">마감일 설정 (선택)</span>
+      <div class="pill" id="datePill"><div class="pill-knob"></div></div>
+    </div>
+    <div class="date-row" id="dateRow">
+      <input type="date" class="date-inp" id="dateInput">
+    </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">취소</button>
+      <button class="btn-save" onclick="saveTask()">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── THEME CONFIG ── */
+const THEMES=[
+  { h:'--t0-h', l:'--t0-light', m:'--t0-mid', a:'--t0-main', d:'--t0-deep', ubg:'--t0-urgent-bg', u:'--t0-urgent', s:'--t0-stripe', us:'--t0-urgent-stripe', sub:'WORK TASKS', logoBgs:[1,0,0,0] },
+  { h:'--t1-h', l:'--t1-light', m:'--t1-mid', a:'--t1-main', d:'--t1-deep', ubg:'--t1-urgent-bg', u:'--t1-urgent', s:'--t1-stripe', us:'--t1-urgent-stripe', sub:'PERSONAL', logoBgs:[0,1,0,0] },
+  { h:'--t2-h', l:'--t2-light', m:'--t2-mid', a:'--t2-main', d:'--t2-deep', ubg:'--t2-urgent-bg', u:'--t2-urgent', s:'--t2-stripe', us:'--t2-urgent-stripe', sub:'SHOPPING', logoBgs:[0,0,1,0] },
+  { h:'--t3-h', l:'--t3-light', m:'--t3-mid', a:'--t3-main', d:'--t3-deep', ubg:'--t3-urgent-bg', u:'--t3-urgent', s:'--t3-stripe', us:'--t3-urgent-stripe', sub:'DAILY ROUTINE', logoBgs:[0,0,0,1] },
+];
+
+function applyTheme(i){
+  const t=THEMES[i], r=document.documentElement.style;
+  const gv=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+  r.setProperty('--th',`var(${t.h})`);
+  r.setProperty('--tl',`var(${t.l})`);
+  r.setProperty('--tm',`var(${t.m})`);
+  r.setProperty('--ta',`var(${t.a})`);
+  r.setProperty('--td',`var(${t.d})`);
+  r.setProperty('--tu-bg',`var(${t.ubg})`);
+  r.setProperty('--tu',`var(${t.u})`);
+  r.setProperty('--ts',`var(${t.s})`);
+  r.setProperty('--tus',`var(${t.us})`);
+  document.getElementById('logoSub').textContent=t.sub;
+  // logo icon stays fixed — no bg switching
+}
+
+/* ── DATA ── */
+const TABS=['work','personal','shopping','routine'];
+const EMPTY=[
+  ['할 일이 없어요 🎉','추가 버튼으로 업무를 관리해보세요'],
+  ['여유로운 하루네요 😊','개인 할 일을 추가해보세요'],
+  ['살 물건이 없어요 🛍️','추가 버튼으로 구매 목록을 시작해보세요'],
+  ['루틴이 없어요 ⏰','매일 반복할 루틴을 추가해보세요'],
+];
+
+let AT=0, editId=null, dateEn=false, urgEn=false;
+let hOpen=[false,false,false,false], hPer=['this','this','this','this'];
+
+const L=k=>{try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}};
+const S=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
+const TK=i=>'ssm4_t_'+TABS[i];
+const HK=i=>'ssm4_h_'+TABS[i];
+const RRK='ssm4_routine_reset'; // last routine-reset date
+
+const today=()=>new Date().toISOString().slice(0,10);
+const fmtDate=d=>{if(!d)return'';const[,m,dy]=d.split('-');return`${parseInt(m)}월 ${parseInt(dy)}일`;};
+const isOD=d=>d&&d<today();
+const mOf=ms=>{const d=new Date(ms);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;};
+const thisM=()=>mOf(Date.now());
+const lastM=()=>{const d=new Date();d.setMonth(d.getMonth()-1);return mOf(d.getTime());};
+const fmtDT=ms=>{const d=new Date(ms);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;};
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+
+/* ── PURGE old history (6 months) ── */
+function purge(){
+  const cut=Date.now()-6*30*24*60*60*1000;
+  [0,1,2,3].forEach(i=>S(HK(i),L(HK(i)).filter(x=>x.completedAt>cut)));
+}
+purge();
+
+/* ── ROUTINE RESET at 06:00 ── */
+function routineReset(){
+  const now=new Date();
+  // Build today's 6am timestamp
+  const reset6=new Date(now.getFullYear(),now.getMonth(),now.getDate(),6,0,0,0);
+  // If it's before 6am today use yesterday's 6am
+  const cutoff=now<reset6?reset6.getTime()-86400000:reset6.getTime();
+  const lastReset=parseInt(localStorage.getItem(RRK)||'0');
+  if(lastReset>=cutoff) return; // already reset today after 6am
+  // Move completed routine tasks back to active if they were completed before last cutoff
+  const hist=L(HK(3));
+  const tasks=L(TK(3));
+  // All items in hist that are "routine-origin" go back to active
+  // We track routine items by having routine:true flag
+  const toRestore=hist.filter(h=>h.routineOrigin);
+  const keep=hist.filter(h=>!h.routineOrigin);
+  toRestore.forEach(h=>{
+    const{completedAt,...item}=h;
+    // avoid duplicates
+    if(!tasks.find(t=>t.routineId===item.routineId)){
+      tasks.push({...item,createdAt:Date.now()});
+    }
+  });
+  S(TK(3),tasks);
+  S(HK(3),keep);
+  localStorage.setItem(RRK,String(Date.now()));
+}
+routineReset();
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function updCounts(){
+  [0,1,2,3].forEach(i=>{
+    const n=L(TK(i)).length;
+    const el=document.getElementById('cnt'+i);
+    if(el)el.textContent=n>0?`${n}개`:'';
+  });
+}
+
+/* ── RENDER ── */
+function render(){
+  const tasks=L(TK(AT));
+  const hist=L(HK(AT));
+  const isRoutine=AT===3;
+  const hP=hPer[AT];
+
+  let filtered=[];
+  if(!isRoutine){
+    if(hP==='this') filtered=hist.filter(h=>mOf(h.completedAt)===thisM());
+    else if(hP==='last') filtered=hist.filter(h=>mOf(h.completedAt)===lastM());
+    else{const lm=lastM();filtered=hist.filter(h=>mOf(h.completedAt)<lm);}
+  } else {
+    filtered=hist.slice();
+  }
+
+  updCounts();
+
+  const sorted=[...tasks].sort((a,b)=>(b.urgent?1:0)-(a.urgent?1:0));
+  let html='';
+
+  html+=`<div class="section-row">
+    <div class="section-label">할 일 목록</div>
+    <div class="section-count">${tasks.length}개</div>
+  </div>`;
+
+  if(!tasks.length){
+    html+=`<div class="empty-wrap">
+      <div class="empty-blob">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--ta)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 11 12 14 22 4"/>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+      </div>
+      <div class="empty-t">${EMPTY[AT][0]}</div>
+      <div class="empty-s">${EMPTY[AT][1]}</div>
+    </div>`;
+  } else {
+    sorted.forEach((t,idx)=>{
+      const od=isOD(t.date);
+      const routineCls=isRoutine?' routine-tint':'';
+      html+=`<div class="task-card${t.urgent?' urgent':''}${routineCls}" id="card-${t.id}">
+        <div class="task-body">
+          <div class="task-text">${esc(t.text)}</div>
+          <div class="task-chips">
+            ${t.urgent?`<span class="chip chip-urgent">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              빠른처리
+            </span>`:''}
+            ${t.date?`<span class="chip chip-date${od?' overdue':''}">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              ${od?'기한초과 · ':''}${fmtDate(t.date)}
+            </span>`:''}
+          </div>
+        </div>
+        <div class="task-right">
+          <button class="act-btn btn-edit" onclick="editT('${t.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="act-btn btn-del" onclick="delT('${t.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+          <button class="complete-btn" onclick="completeT('${t.id}')">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </div>`;
+    });
+  }
+
+  html+=`<div class="add-btn" onclick="openAdd()">
+    <div class="add-icon">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </div>
+    <span>${isRoutine?'루틴 항목 추가하기':'새 항목 추가하기'}</span>
+  </div>`;
+
+  // HISTORY
+  const hO=hOpen[AT];
+  html+=`<div class="history-wrap">
+    <button class="hist-toggle-btn" onclick="toggleHist()">
+      <div class="hist-toggle-left">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        완료 내역
+        <span class="hist-badge">${hist.length}</span>
+      </div>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" class="chevron${hO?' open':''}"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="history-panel${hO?' open':''}">
+      ${!isRoutine?`<div class="period-tabs">
+        <button class="period-tab${hP==='this'?' active':''}" onclick="setPer('this')">이번 달</button>
+        <button class="period-tab${hP==='last'?' active':''}" onclick="setPer('last')">지난 달</button>
+        <button class="period-tab${hP==='old'?' active':''}" onclick="setPer('old')">오래된 내역</button>
+      </div>`:''}
+      ${filtered.length===0
+        ?`<div class="empty-wrap" style="padding:14px 0">
+            <div class="empty-blob" style="width:46px;height:46px">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ta)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="empty-t">완료 내역이 없어요</div>
+          </div>`
+        :filtered.slice().reverse().map(h=>`
+          <div class="hist-card">
+            <div class="hist-check">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="hist-body">
+              <div class="hist-text">${esc(h.text)}${h.urgent?'<span style="font-size:10px;color:var(--td);margin-left:5px;font-weight:700;"> · 빠른처리</span>':''}</div>
+              <div class="hist-meta">${fmtDT(h.completedAt)}${h.date?' · 마감 '+fmtDate(h.date):''}</div>
+            </div>
+            <div class="hist-btns">
+              ${!isRoutine?`<button class="hbtn hbtn-restore" onclick="restoreT('${h.id}')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </button>`:''}
+              <button class="hbtn hbtn-del" onclick="delHist('${h.id}')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>`).join('')
+      }
+    </div>
+  </div>`;
+
+  document.getElementById('mainScroll').innerHTML=html;
+}
+
+function switchTab(i){
+  AT=i;
+  document.querySelectorAll('.tab').forEach((el,j)=>el.classList.toggle('active',i===j));
+  applyTheme(i);
+  render();
+}
+
+function toggleHist(){ hOpen[AT]=!hOpen[AT]; render(); }
+function setPer(p){ hPer[AT]=p; render(); }
+
+function delHist(id){ S(HK(AT),L(HK(AT)).filter(h=>h.id!==id)); render(); }
+
+function restoreT(id){
+  const hist=L(HK(AT)), item=hist.find(h=>h.id===id);
+  if(!item)return;
+  S(HK(AT),hist.filter(h=>h.id!==id));
+  const{completedAt,...r}=item;
+  const tasks=L(TK(AT));
+  tasks.push({...r,createdAt:Date.now()});
+  S(TK(AT),tasks);
+  toast('↩ 할 일 목록으로 복구했어요');
+  render();
+}
+
+function completeT(id){
+  const tasks=L(TK(AT)), t=tasks.find(t=>t.id===id);
+  if(!t)return;
+  S(TK(AT),tasks.filter(t=>t.id!==id));
+  const hist=L(HK(AT));
+  // For routine: mark as routineOrigin so it gets auto-restored at 6am
+  hist.push({...t, completedAt:Date.now(), ...(AT===3?{routineOrigin:true,routineId:t.id}:{})});
+  S(HK(AT),hist);
+  const card=document.getElementById('card-'+id);
+  if(card){
+    card.style.transition='all 0.2s';
+    card.style.opacity='0';
+    card.style.transform='translateX(24px) scale(0.96)';
+    setTimeout(()=>{ toast('✓ 완료!'); render(); },210);
+  }
+}
+
+function delT(id){
+  if(!confirm('삭제할까요?'))return;
+  S(TK(AT),L(TK(AT)).filter(t=>t.id!==id));
+  render();
+}
+
+function editT(id){
+  const t=L(TK(AT)).find(t=>t.id===id);
+  if(!t)return;
+  editId=id;
+  document.getElementById('modalTitle').textContent='할 일 수정';
+  document.getElementById('taskInput').value=t.text;
+  dateEn=!!t.date; urgEn=!!t.urgent;
+  if(t.date)document.getElementById('dateInput').value=t.date;
+  document.getElementById('urgentDateSection').style.display=AT===3?'none':'block';
+  syncModal(); openModal();
+}
+
+function openAdd(){
+  editId=null;
+  document.getElementById('modalTitle').textContent=AT===3?'루틴 추가':'새 할 일 추가';
+  document.getElementById('taskInput').value='';
+  dateEn=false; urgEn=false;
+  document.getElementById('dateInput').value=today();
+  // hide urgent/date toggles for routine tab
+  document.getElementById('urgentDateSection').style.display=AT===3?'none':'block';
+  syncModal(); openModal();
+}
+function openModal(){
+  document.getElementById('modalBg').classList.add('open');
+  setTimeout(()=>document.getElementById('taskInput').focus(),300);
+}
+function closeModal(){ document.getElementById('modalBg').classList.remove('open'); }
+function mbgClick(e){ if(e.target===document.getElementById('modalBg'))closeModal(); }
+
+function toggleUrgent(){ urgEn=!urgEn; syncModal(); }
+function toggleDate(){
+  dateEn=!dateEn;
+  if(dateEn&&!document.getElementById('dateInput').value)document.getElementById('dateInput').value=today();
+  syncModal();
+}
+function syncModal(){
+  document.getElementById('urgentPill').classList.toggle('on',urgEn);
+  document.getElementById('urgentRow').classList.toggle('urgent-on',urgEn);
+  document.getElementById('datePill').classList.toggle('on',dateEn);
+  document.getElementById('dateRow').classList.toggle('open',dateEn);
+}
+
+function saveTask(){
+  const text=document.getElementById('taskInput').value.trim();
+  if(!text){document.getElementById('taskInput').focus();return;}
+  const isRoutine=AT===3;
+  const date=(!isRoutine&&dateEn)?document.getElementById('dateInput').value:null;
+  const urgent=!isRoutine&&urgEn;
+  let tasks=L(TK(AT));
+  if(editId){
+    tasks=tasks.map(t=>t.id===editId?{...t,text,date,urgent}:t);
+    toast('수정됐어요');
+  } else {
+    const item={id:uid(),text,date,urgent,createdAt:Date.now()};
+    if(isRoutine){item.routineId=item.id;}
+    tasks.push(item);
+    toast('추가됐어요 ✓');
+  }
+  S(TK(AT),tasks);
+  closeModal(); render();
+}
+
+/* ── INIT ── */
+applyTheme(0);
+render();
+
+/* ── ROUTINE: check reset every minute ── */
+setInterval(()=>{ routineReset(); if(AT===3)render(); }, 60000);
+</script>
+</body>
+</html>
